@@ -1,101 +1,189 @@
 import java.io.File;
+//import java.nio.file.Files;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.util.Scanner;
-import java.util.ArrayList;
+//import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+//import java.util.stream.Collectors;
 public class GardenOrganization {
    public static void main(String[] args) throws IOException {
-   try {
-     FileWriter myWriter = new FileWriter("C:\\Users\\hunte\\OneDrive - Omaha Public Schools\\Junior Year IB\\computer science\\GardenOrganization.txt");
-      Scanner stdIn = new Scanner(System.in); // new scanner
-  
-     System.out.println("Hello! Welcome to your new Garden Organization software! What is today's date?"); // initial question to start in jGrasp
-      String date = stdIn.nextLine(); // acquire date
-      long amount = 0;
-  
-     System.out.println("Thank you! Would you like to start a new harvest? yes/no");
-      String choice = stdIn.nextLine();//first choice to ask user
-      
-    if (!choice.equals ("yes")) {//no answer to first choice
-     System.out.println("You must start a new harvest to store data. Would you like to start a new harvest? yes/no");//next question in jGrasp
-     String choice2 = stdIn.nextLine();//no answer second choice
-     
-    if ((choice.equals ("yes"))|| (choice2.equals ("yes"))) { //first if statement for yes first answer and yes second answer
-     System.out.println("What would you like to name your harvest? (ex. Fall Harvest 2023)");
-     String harvestName = stdIn.nextLine();// getting name of harvest
-     myWriter.write(harvestName);//putting harvest name at the top in the text editor
-     
-     myWriter.write("\n" + "Plants in " + harvestName + " for " + date + ":\n");//starting equals for inital first list of plants for specified harvest
-   }
-}
-     System.out.println("How many plants do you want to enter today? (ex. 10)");
-     long plantListMany = stdIn.nextLong(); //long for long amount
-      
-     String[] plantList = new String[100];//plantlist array but in string form
-   
-   System.out.println("please list your plants, entering each plant for each line");
-   
-  for (int i = 0; i <= plantListMany; i++) {
-     plantList[i] = stdIn.nextLine();
-}
-
-  for (int i=1;i<=plantListMany;i++) {
-     myWriter.write(plantList[i] + "\n");
-}
-     myWriter.write("Harvested vegetables for " + date + ":\n");
-
-     System.out.println("Would you like to add an amount to any items? yes/no");
-     String choiceTwo = stdIn.nextLine();
-   if (!choiceTwo.equals ("yes")) {
-    for (int i = 1;i<=plantListMany;i++) {
-    myWriter.write(plantList[i] + " had 0 amount added for " + date);
-    System.out.println("added 0 amount for " + plantList[i]);
+      try {
+         FileWriter OrganizationWriter = new FileWriter("C:\\Users\\sstoffh423\\OneDrive - Omaha Public Schools\\Junior Year IB\\computer science\\GardenOrganization.txt", true);
+         Scanner stdIn = new Scanner(System.in).useDelimiter(Pattern.compile("[\\r\\n;]+")); // new scanner
+         long amount = 0; // this is the amount that will be in association with each plant
+         System.out.println("Hello! Welcome to Plant Byte! What is today's date?"); // initial question to start in jGrasp
+         String date = stdIn.nextLine(); // acquire date
+         
+         while (true) {
+            System.out.println("Would you like to start a new harvest? yes/no");
+            String choice = stdIn.nextLine();//creating a new harvest or adding to a harvest
+            
+            if (!choice.equals ("yes")) { // adding to an existing harvest option
+               System.out.println("Your harvests:");
+               File[] harvestSearchOne = Path.of(".").toFile().listFiles(harvestSearch -> harvestSearch.getName().endsWith(".harvest")); //finding files on computer that end in .harvest
+               Arrays.stream(harvestSearchOne).forEach(System.out::println); // outprinting options in jGrasp
+               File harvestSearch = harvestSearchOne[0];
+            
+               System.out.println("To choose: type the harvest name");
+               String harvestChoice = stdIn.nextLine(); //chosen harvest input 
+               harvestChoice = harvestChoice + ".harvest";
+               File file = new File (harvestChoice);
+               FileWriter ChosenHarvestWriter = new FileWriter(harvestChoice, true);//making the file unoverrided so user can see what was previously inputted. 
+               ChosenHarvestWriter.write("Plants logged in " + harvestChoice + " for " + date + ":\n");
+               OrganizationWriter.write("Plants logged in " + harvestChoice + " for " + date + ":\n");
+               System.out.println("Do you want to add any new plants? yes/no");
+               String choicePlant = stdIn.nextLine();
+               String[] addingPlantList = new String[100];
+               
+               if (choicePlant.equals ("yes")) {
+                  System.out.println("How many plants do you want to enter? (ex. 10)");
+                  long plantListManyNew = stdIn.nextLong();
+                  stdIn.nextLine();
+                  System.out.println("Please list your plants, entering one for each line.");
+               
+                  for (int i = 0; i <plantListManyNew; i++) {
+                     addingPlantList[i] = stdIn.nextLine();
+                  }
+                  ChosenHarvestWriter.write("Added plants on " + date + "\n");
+                  OrganizationWriter.write("Added plants on " + date + "\n");
+                  for (int i=0;i<plantListManyNew;i++) {
+                     ChosenHarvestWriter.write(addingPlantList[i] + "\n");
+                     OrganizationWriter.write(addingPlantList[i] + "\n");
+                  
+                  }
+               }
+               ChosenHarvestWriter.flush();
+               ChosenHarvestWriter.close();   
+            }
+         
+            if ((choice.equals ("yes"))) { //first if statement for yes first answer and yes second answer
+               System.out.println("What would you like to name your harvest? (ex. Fall Harvest 2023)");
+               String harvestName = stdIn.nextLine();// getting name of harvest
+            
+               File file = new File(harvestName + ".harvest");//creating a new harvest appending .harvest at the end to let the adding to harvest option preceed if necessary
+               try { 
+                  FileWriter harvestWriter = new FileWriter(harvestName + ".harvest");//letting myWriter write to the chosen file
+                  OrganizationWriter.write(harvestName);//putting harvest name at the top in the text editor
+                  harvestWriter.write(harvestName);
+               
+                  harvestWriter.write("\n" + "Plants logged in " + harvestName + " for " + date + ":\n");//starting equals for inital first list of plants for specified harvest
+                  OrganizationWriter.write("\n" + "Plants logged in " + harvestName + " for " + date + ":\n");
+               
+               
+                  System.out.println("How many plants do you want to enter today? (ex. 10)");
+                  long plantListMany = stdIn.nextLong(); //long for long amount
+                  stdIn.nextLine();
+               
+                  String[] plantList = new String[100];//plantlist array but in string form
+               
+                  System.out.println("please list your plants, entering each plant for each line");
+               
+                  for (int i = 0; i <plantListMany; i++) {
+                     plantList[i] = stdIn.nextLine();//assinging string value to user specified amount
+                  }
+               
+                  for (int i=0;i<plantListMany;i++) {
+                     harvestWriter.write(plantList[i] + "\n");//outputting into myWriter for designated file
+                     OrganizationWriter.write(plantList[i] + "\n");
+                  
+                  }
+                  harvestWriter.write("Harvested vegetables for " + date + ":\n");
+                  OrganizationWriter.write("Harvested vegetables for " + date + ":\n");
+               
+                  System.out.println("Would you like to add an amount to any items? yes/no");
+                  String choiceTwo = stdIn.nextLine();
+                  
+                  if (!choiceTwo.equals ("yes")) {// no amount added to any items option
+                     for (int i = 0;i<plantListMany;i++) {
+                        harvestWriter.write(plantList[i] + " had 0 amount added for " + date);
+                        OrganizationWriter.write(plantList[i] + " had 0 amount added for " + date);
+                        System.out.println("added 0 amount for " + plantList[i]);
+                     }
+                  }
+                  
+                  if (choiceTwo.equals ("yes")) {//yes amount added option 
+                     for (int i = 0;i<plantListMany;i++) {
+                        System.out.println("Would you like to add an amount to " + plantList[i] + "? yes/no"); //getting more specific with which plant to add an amount to
+                        String choiceThree = stdIn.nextLine();
+                     
+                        if (choiceThree.equals ("yes")) {
+                           System.out.println("amount:");
+                           amount = stdIn.nextLong();
+                           stdIn.nextLine();
+                           harvestWriter.write(plantList[i] +" " + amount + "\n");//initial amount added to the plant 
+                           OrganizationWriter.write(plantList[i] + " " + amount + "\n");
+                        }
+                     
+                        if (!choiceThree.equals ("yes")) {
+                           harvestWriter.write(plantList[i] + " " + amount + "\n");//reinstating the 0 amount added
+                           OrganizationWriter.write(plantList[i] + amount + "\n");
+                        }
+                     }
+                  }
+               
+                  System.out.println("Would you like to add any notes to any items? yes/no");//adding notes to items, same concept but in string form.
+                  String choiceFour = stdIn.nextLine();
+                  
+                  if (choiceFour.equals ("yes")) {
+                     for (int i = 0; i<plantListMany;i++) {
+                        System.out.println("Would you like to add notes to " +plantList[i] + "? yes/no");
+                        String choiceFive = stdIn.nextLine();
+                        
+                        if (choiceFive.equals ("yes")) {
+                           harvestWriter.write(plantList[i] + " notes for " + date + ":\n");
+                           OrganizationWriter.write(plantList[i] + " notes for " + date + ":\n");
+                           System.out.println("Begin typing notes for " + plantList[i] + ":");
+                           String plantNotes = stdIn.nextLine();
+                           harvestWriter.write(plantNotes + "\n");
+                           OrganizationWriter.write(plantNotes + "\n");
+                        }
+                     
+                        if (!choiceFive.equals ("yes")) {
+                           harvestWriter.write(plantList[i] + ": no notes added for " + date + "\n");
+                           OrganizationWriter.write(plantList[i] + ": no notes added for " + date + "\n");
+                           System.out.println("no notes added"); // no notes added 
+                        }
+                     }
+                  } 
+                  if (!choiceFour.equals ("yes")) {
+                     for (int i = 0; i<plantListMany;i++) {
+                        System.out.println("No notes added for " + plantList[i] + " on " + date);
+                     }  
+                  } 
+                  harvestWriter.flush();
+                  harvestWriter.close();                        
+               }
+               catch (IOException e) {
+                  System.out.println("An error occured.");
+                  e.printStackTrace();
+               }
+            }
+            System.out.println("Would you like to create or add to another harvest? yes/no");
+            String proceedChoice = stdIn.nextLine();
+            
+            if (proceedChoice.equals ("no")) {
+               break;
+            }
+         }
+         System.out.println("Successfully wrote to file(s)");
+         
+         
+         
+         OrganizationWriter.flush();
+         OrganizationWriter.close();
       }
-   }
-   if (choiceTwo.equals ("yes")) {
-    for (int i = 1;i<=plantListMany;i++) {
-     System.out.println("Would you like to add an amount to " + plantList[i] + "? yes/no");
-     String choiceThree = stdIn.nextLine();
-     
-    if (choiceThree.equals ("yes")) {
-        System.out.println("total:");
-        amount = stdIn.nextLong(); 
-        myWriter.write(plantList[i] +" " + amount); 
-      }
       
-     
-     if (!choiceThree.equals ("yes")) {
-     myWriter.write(plantList[i] + " " + amount);
-      }
-     }
-     }
-     
-     System.out.println("Would you like to add any notes to any items? yes/no");
-     String choiceFour = stdIn.nextLine();
-     
-     if (choiceFour.equals ("yes")) {
-      for (int i = 1; i<=plantListMany;i++) {
-      System.out.println("Would you like to add notes to " +plantList[i] + "? yes/no");
-      String choiceFive = stdIn.nextLine();
-      
-      if (!choiceFive.equals ("yes")) {
-      myWriter.write(plantList[i] + ": no notes added for " + date);
-      System.out.println("no notes added");
-      
-     }
-   }
- }
- 
- 
- 
-       System.out.println("Successfully wrote to the file.");
-     }
       catch (IOException e) {
-       System.out.println("An error occured.");
-       e.printStackTrace();
-       }
+         System.out.println("An error occured.");
+         e.printStackTrace();
       }
-      }
+   }
+}
+
    
  
    
